@@ -51,8 +51,9 @@ test('CLI server serves only tool assets and does not expose workspace files', a
   t.after(()=>new Promise(resolve=>server.close(resolve))); const base='http://127.0.0.1:'+server.address().port;
   const home=await fetch(base); assert.equal(home.status,200); assert.match(await home.text(),/Hub Preview Studio/);
   for (const path of ['/package.json','/.env','/exports','/../README.md','/@fs/etc/passwd']) assert.equal((await fetch(base+path)).status,404,path);
+  const languageModule = await fetch(base+'/i18n.js'); assert.equal(languageModule.status,200); assert.match(await languageModule.text(),/LOCALE_KEY/);
   assert.equal((await fetch(base,{method:'POST'})).status,405);
   const hostile = await new Promise((resolve,reject) => { const request=http.get(base,{headers:{Host:'untrusted.example'}},response=>{response.resume();resolve(response.statusCode);}); request.on('error',reject); });
   assert.equal(hostile,403);
-  assert.deepEqual(await (await fetch(base+'/health')).json(),{tool:'hub-preview-studio',version:'0.1.0'});
+  assert.deepEqual(await (await fetch(base+'/health')).json(),{tool:'hub-preview-studio',version:'0.1.1'});
 });

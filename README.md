@@ -27,12 +27,16 @@ npm start -- --app http://localhost:5173 --port 4177
 You can also download the `.tgz` from [Releases](https://github.com/zijiebuzhuang/hub-preview-studio/releases):
 
 ```sh
-npm install -g ./hub-preview-studio-0.1.0.tgz
+npm install -g ./hub-preview-studio-0.1.1.tgz
 hub-preview-studio --app http://localhost:5173
 ```
 
 The package is **not published to the npm registry**. Install the release file
 or run the source; a registry install by package name is not available.
+
+## Language
+
+Choose **English** or **简体中文** in the top bar. Studio initially follows your browser language and remembers a manual choice on this browser. Changing language updates the workspace, guide and built-in example without reloading the connected project. Edited example text is preserved; external projects keep their own language.
 
 ## Phone preview
 
@@ -55,7 +59,7 @@ Phone previews work without an adapter. Glasses layouts require an explicit
 **development-only** bridge. Install this release in the project:
 
 ```sh
-npm install --save-dev /path/to/hub-preview-studio-0.1.0.tgz
+npm install --save-dev /path/to/hub-preview-studio-0.1.1.tgz
 ```
 
 At the project's bridge creation point, choose the preview bridge only in
@@ -130,8 +134,9 @@ npm pack --dry-run
 npm pack
 ```
 
-The five automated checks cover frame limits, source/origin pinning, text
-replacement, bridge events/images/storage, and server file isolation. Desktop
+The seven automated checks cover frame limits, source/origin pinning, text
+replacement, bridge events/images/storage, server file isolation, language
+preferences with unavailable storage, and translated dynamic messages. Desktop
 validation also covers cross-port integration, text/image updates, gesture
 round trips, light/dark appearance, 320/393 phone sizes, and actual PNG/JSON
 exports. This is not physical-device validation.

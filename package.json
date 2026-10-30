@@ -1,6 +1,6 @@
 {
   "name": "hub-preview-studio",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Independent local phone and 576x288 glasses preview tool for Even Hub projects",
   "type": "module",
   "license": "MIT",

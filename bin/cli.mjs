@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 import { createStudioServer } from '../lib/server.mjs';
 const args = process.argv.slice(2);
-const help = 'Hub Preview Studio 0.1.0 — independent local layout tool\n\nUsage: hub-preview-studio [--app http://localhost:5173] [--port 4177]\n\nPhone preview accepts any embeddable HTTP(S) project. Glasses output uses the optional client adapter.\nDefault opens a neutral built-in example. Listens on 127.0.0.1 only.\n';
+const help = 'Hub Preview Studio 0.1.1 — independent local layout tool\n\nUsage: hub-preview-studio [--app http://localhost:5173] [--port 4177]\n\nPhone preview accepts any embeddable HTTP(S) project. Glasses output uses the optional client adapter.\nDefault opens a neutral built-in example. Listens on 127.0.0.1 only.\n';
 if (args.includes('--help') || args.includes('-h')) { console.log(help); process.exit(0); }
-if (args.includes('--version')) { console.log('0.1.0'); process.exit(0); }
+if (args.includes('--version')) { console.log('0.1.1'); process.exit(0); }
 try {
   const options = {};
   for (let i = 0; i < args.length; i++) {

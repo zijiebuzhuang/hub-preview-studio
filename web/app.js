@@ -1,15 +1,29 @@
 import { CHANNEL, normalizeFrame, validAppURL } from '/protocol.js';
+import { initialLocale, normalizeLocale, saveLocale, t, translateError, applyTranslations } from '/i18n.js';
 const $ = id => document.getElementById(id);
 const iframe = $('phone'), canvas = $('glass');
 let current = null, expectedOrigin = '', sourceURL = '', frames = 0, connected = false, paintRevision = 0;
-const error = message => { $('error').textContent = message || ''; };
+let locale = initialLocale(), phoneKey = 'No project loaded', noteKey = 'Use your own dev server or explore the neutral example.', errorState = null, downloadName = '';
+function error(message, kind = 'error') { errorState = message ? { message, kind } : null; renderState(); }
+function renderState() {
+  document.documentElement.lang = locale; applyTranslations(document, locale); $('language').value = locale;
+  $('phone-state').textContent = t(locale, phoneKey); $('connection-note').textContent = t(locale, noteKey);
+  $('bridge-state').textContent = t(locale, connected ? 'Preview adapter connected' : 'Adapter not connected');
+  $('frame-count').textContent = t(locale, '{n} frames', { n: frames }); $('node-count').textContent = t(locale, '{n} containers', { n: current?.nodes.length || 0 });
+  if (downloadName) $('download-result').textContent = t(locale, 'Ready · Save {name} again', { name: downloadName });
+  $('error').textContent = errorState ? (errorState.kind === 'frame' ? t(locale, 'Frame rejected: {reason}', { reason: translateError(locale, errorState.message) }) : translateError(locale, errorState.message)) : '';
+  if (current) $('nodes').querySelectorAll('.node b').forEach((el, i) => { const n = current.nodes[i]; el.textContent = t(locale, n.type) + ' · ' + n.id; });
+}
+function sendLocale() { if (sourceURL && new URL(sourceURL).origin === location.origin && new URL(sourceURL).pathname === '/example/') send('locale', { locale }); }
+$('language').onchange = () => { locale = normalizeLocale($('language').value); saveLocale(locale); renderState(); sendLocale(); };
+renderState();
 function clearFrame() {
   current = null; frames = 0; connected = false; ++paintRevision;
   $('download-result').hidden = true; $('download-result').removeAttribute('href');
   canvas.getContext('2d').clearRect(0, 0, 576, 288);
   $('waiting').hidden = false; $('bridge-state').textContent = 'Adapter not connected';
-  $('bridge-dot').classList.remove('live'); $('frame-count').textContent = '0 frames';
-  $('node-count').textContent = '0 containers'; $('nodes').replaceChildren();
+  $('bridge-dot').classList.remove('live'); downloadName = ''; renderState();
+  const empty = document.createElement('p'); empty.dataset.i18n = 'No display data yet.'; empty.textContent = t(locale, 'No display data yet.'); $('nodes').replaceChildren(empty);
   for (const id of ['export', 'export-json']) $(id).disabled = true;
 }
 function connect(value) {
@@ -19,33 +33,33 @@ function connect(value) {
     sourceURL = target.href; expectedOrigin = target.origin;
     target.searchParams.set('__hub_studio_origin', location.origin);
     clearFrame(); error(''); $('project-url').value = sourceURL;
-    $('phone-state').textContent = 'Loading project…';
-    $('connection-note').textContent = 'Phone loads directly. Glasses output appears when the adapter connects.';
+    phoneKey = 'Loading project…';
+    noteKey = 'Phone loads directly. Glasses output appears when the adapter connects.'; renderState();
     $('open-app').href = sourceURL; iframe.src = target.href;
   } catch (e) { error(e.message); }
 }
 function send(type, payload = {}) {
   if (expectedOrigin) iframe.contentWindow?.postMessage({ channel: CHANNEL, type, ...payload }, expectedOrigin);
 }
-iframe.addEventListener('load', () => { $('phone-state').textContent = 'Iframe loaded · project server'; send('hello'); });
+iframe.addEventListener('load', () => { phoneKey = 'Iframe loaded · project server'; renderState(); send('hello'); sendLocale(); });
 window.addEventListener('message', event => {
   if (event.source !== iframe.contentWindow || event.origin !== expectedOrigin || event.data?.channel !== CHANNEL) return;
   try {
     if (event.data.type === 'disconnect') { clearFrame(); return; }
-    if (event.data.type === 'ready') { connected = true; $('bridge-state').textContent = 'Preview adapter connected'; $('bridge-dot').classList.add('live'); error(''); }
+    if (event.data.type === 'ready') { connected = true; $('bridge-state').textContent = t(locale, 'Preview adapter connected'); $('bridge-dot').classList.add('live'); error(''); }
     if (event.data.type !== 'frame') return;
     current = normalizeFrame(event.data.frame); connected = true; frames++;
-    $('waiting').hidden = true; $('bridge-state').textContent = 'Preview adapter connected'; $('bridge-dot').classList.add('live');
-    $('frame-count').textContent = frames + ' frames'; $('node-count').textContent = current.nodes.length + ' containers';
+    $('waiting').hidden = true; $('bridge-state').textContent = t(locale, 'Preview adapter connected'); $('bridge-dot').classList.add('live');
+    $('frame-count').textContent = t(locale, '{n} frames', {n: frames}); $('node-count').textContent = t(locale, '{n} containers', {n: current.nodes.length});
     $('nodes').replaceChildren(...current.nodes.map(n => {
       const row = document.createElement('div'); row.className = 'node';
-      const title = document.createElement('b'); title.textContent = n.type + ' · ' + n.id;
+      const title = document.createElement('b'); title.textContent = t(locale, n.type) + ' · ' + n.id;
       const bounds = document.createElement('span'); bounds.textContent = `${n.x}, ${n.y} · ${n.width} × ${n.height}`;
       row.append(title, bounds); return row;
     }));
     for (const id of ['export', 'export-json']) $(id).disabled = false;
     void repaint();
-  } catch (e) { error('Frame rejected: ' + e.message); }
+  } catch (e) { error(e.message, 'frame'); }
 });
 const timer = setInterval(() => { if (!connected) send('hello'); }, 1000);
 window.addEventListener('pagehide', () => clearInterval(timer), { once: true });
@@ -114,7 +128,7 @@ function download(blob, name) {
   const reader = new FileReader();
   reader.onload = () => {
     const link = $('download-result'); link.href = reader.result; link.download = name;
-    link.textContent = 'Ready · Save ' + name + ' again'; link.hidden = false; link.click();
+    downloadName = name; link.textContent = t(locale, 'Ready · Save {name} again', {name}); link.hidden = false; link.click();
   };
   reader.onerror = () => error('Could not prepare the export. Try again.');
   reader.readAsDataURL(blob);

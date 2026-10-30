@@ -4,6 +4,8 @@
 
 独立的本地开发工作台：在同一窗口预览 Hub 项目的手机界面和 576 × 288 眼镜布局。非 Even Realities 官方产品，也不替代官方 Simulator。Node.js 20+，零运行时依赖，无需构建。
 
+![中文工作台](./docs/preview-zh.jpg)
+
 ## 安装与启动
 
 从源码运行：
@@ -23,13 +25,17 @@ npm start -- --app http://localhost:5173 --port 4177
 使用分发包：
 
 ```sh
-npm install -g ./hub-preview-studio-0.1.0.tgz
+npm install -g ./hub-preview-studio-0.1.1.tgz
 hub-preview-studio --app http://localhost:5173
 ```
 
 浏览器打开终端显示的 `http://127.0.0.1:4177`。不传 `--app` 时打开内置中性示例。默认不自动打开浏览器。工具只监听本机回环地址；不代理项目、不扫描项目目录、不部署服务、不访问 AI API。所有必要文件随 npm 包提供，源码包与 npm tgz 可独立于外部项目运行。
 
 项目采用 [MIT 许可证](./LICENSE)，公开源码位于 [GitHub](https://github.com/zijiebuzhuang/hub-preview-studio)。可从 [Releases](https://github.com/zijiebuzhuang/hub-preview-studio/releases) 下载安装包。尚未发布到 npm 注册表，不能直接用包名从注册表安装。
+
+## 界面语言
+
+顶部语言选项支持 **简体中文 / English**。首次跟随浏览器语言，手动选择后保存在当前浏览器；存储不可用时仍可切换。语言切换覆盖工作台、接入指南与内置示例，不会重载已连接项目；示例中用户编辑过的文字保留，外部项目仍使用自己的语言。
 
 ## 工作台外观
 
@@ -46,7 +52,7 @@ hub-preview-studio --app http://localhost:5173
 跨来源 iframe 不能自动读取项目内部状态。需要一个轻量开发适配器。在项目中安装工具包，再将原来的桥接创建位置改为：
 
 ```sh
-npm install --save-dev /path/to/hub-preview-studio-0.1.0.tgz
+npm install --save-dev /path/to/hub-preview-studio-0.1.1.tgz
 ```
 
 ```js
@@ -95,4 +101,4 @@ npm test
 npm pack
 ```
 
-npm 包显式包含 bin、lib、web、examples、文档、LICENSE 和 NOTICE；不包含测试与 CI。源码仓库包含测试与 CI。测试覆盖来源校验、文本覆盖、数据边界、事件、图像格式及服务端目录隔离。2026-10-30：5 项自动检查通过；独立安装目录启动、跨端口项目接入、文本/图像更新、手势回传、深色主题、320/393 视口及实际 PNG/JSON 导出完成桌面验证。透明 PNG 尺寸为 576×288，调试边框不进入导出。推荐在官方 Simulator 和 Android/iOS 真机补齐运行验收。
+npm 包显式包含 bin、lib、web、examples、文档、LICENSE 和 NOTICE；不包含测试与 CI。源码仓库包含测试与 CI。测试覆盖来源校验、文本覆盖、数据边界、事件、图像格式、服务端目录隔离，以及语言偏好回退和动态文案。2026-10-30：7 项自动检查通过；独立安装目录启动、跨端口项目接入、文本/图像更新、手势回传、深色主题、320/393 视口及实际 PNG/JSON 导出完成桌面验证。透明 PNG 尺寸为 576×288，调试边框不进入导出。推荐在官方 Simulator 和 Android/iOS 真机补齐运行验收。
