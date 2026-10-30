@@ -1,0 +1,10 @@
+Hub Preview Studio is an independent community tool. It is not affiliated
+with or endorsed by Even Realities and does not replace the official simulator.
+
+Even Realities, Even Hub and G2 are names of their respective owner. References
+to these products describe compatibility only.
+
+No Even Hub SDK implementation, commercial font files, or vendor artwork is
+bundled. The preview bridge implements a limited compatible API surface;
+projects obtain the official SDK separately under its own terms. Font names
+in CSS use locally available fonts with system fallbacks.
